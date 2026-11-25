@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Return Book — LibraDesk</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="../css/styles.css" rel="stylesheet">
+</head>
+<body>
+  <div id="app-shell" class="app-shell">
+    <div id="page-content">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Return Book</h1>
+          <p class="page-subtitle">Check in borrowed copies, calculate overdue fines, and update copy availability</p>
+        </div>
+      </div>
+
+      <div class="row g-4 align-items-start">
+        <div class="col-12 col-lg-5">
+          <div class="surface-panel">
+            <div class="panel-header">
+              <h2 class="panel-title">Return Counter</h2>
+              <span class="text-secondary small" id="fine-rate-label">₹5.00 / overdue day</span>
+            </div>
+            <div class="panel-body">
+              <form id="return-form" novalidate>
+                <div id="return-error" class="alert alert-danger d-none" role="alert"></div>
+                <div class="mb-3">
+                  <label class="form-label" for="return-loan-select">Select Active Loan</label>
+                  <select class="form-select" id="return-loan-select">
+                    <option value="">Choose an active loan...</option>
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label" for="return-accession">Or Enter Accession Number</label>
+                  <input type="text" class="form-control" id="return-accession" placeholder="e.g. ACC-002">
+                </div>
+                <div class="row g-3 mb-3">
+                  <div class="col-md-6">
+                    <label class="form-label" for="return-date">Return Date *</label>
+                    <input type="date" class="form-control" id="return-date" required>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label" for="return-condition">Copy Condition *</label>
+                    <select class="form-select" id="return-condition" required>
+                      <option value="Available">Good (Mark Available)</option>
+                      <option value="Damaged">Damaged</option>
+                      <option value="Lost">Lost</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="p-3 mb-3 border rounded bg-light small" id="fine-preview-box">
+                  Select a loan to preview overdue days and calculated fine.
+                </div>
+                <div class="mb-3">
+                  <label class="form-label" for="return-notes">Notes</label>
+                  <input type="text" class="form-control" id="return-notes" maxlength="500" placeholder="Optional return remarks">
+                </div>
+                <button type="submit" class="btn btn-primary w-100 justify-content-center" id="submit-return-btn">
+                  <i class="bi bi-journal-arrow-down"></i> Complete Return
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 col-lg-7">
+          <div class="table-container">
+            <div class="panel-header">
+              <h2 class="panel-title">Currently Borrowed Books</h2>
+              <span class="text-secondary small">Click a row to select</span>
+            </div>
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Loan #</th>
+                    <th>Accession</th>
+                    <th>Book</th>
+                    <th>Member</th>
+                    <th>Due Date</th>
+                    <th>Status</th>
+                    <th class="text-end">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="return-loans-tbody">
+                  <tr><td colspan="7" class="loading-state">Loading active loans...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script type="module" src="../js/return-book.js"></script>
+</body>
+</html>

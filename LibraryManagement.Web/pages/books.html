@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Books — LibraDesk</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="../css/styles.css" rel="stylesheet">
+</head>
+<body>
+  <div id="app-shell" class="app-shell">
+    <div id="page-content">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Books Catalogue</h1>
+          <p class="page-subtitle">Manage book titles, ISBNs, authors, and copy counts</p>
+        </div>
+        <button type="button" class="btn btn-primary" id="add-book-btn">
+          <i class="bi bi-plus-lg"></i> Add Book
+        </button>
+      </div>
+
+      <div class="filter-toolbar">
+        <div class="search-input-wrap">
+          <i class="bi bi-search"></i>
+          <input type="text" class="form-control" id="book-search" placeholder="Search title, ISBN, or author...">
+        </div>
+        <select class="form-select w-auto" id="book-filter-category">
+          <option value="">All Categories</option>
+        </select>
+        <select class="form-select w-auto" id="book-filter-publisher">
+          <option value="">All Publishers</option>
+        </select>
+        <select class="form-select w-auto" id="book-sort">
+          <option value="title:ASC">Sort: Title (A-Z)</option>
+          <option value="title:DESC">Sort: Title (Z-A)</option>
+          <option value="publicationYear:DESC">Sort: Year (Newest)</option>
+          <option value="publicationYear:ASC">Sort: Year (Oldest)</option>
+        </select>
+        <button type="button" class="btn btn-outline-secondary btn-sm" id="book-reset-btn">Reset</button>
+      </div>
+
+      <div class="table-container">
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>ISBN</th>
+                <th>Author(s)</th>
+                <th>Category</th>
+                <th>Publisher</th>
+                <th class="text-end">Year</th>
+                <th class="text-end">Copies (Avail)</th>
+                <th class="text-end">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="books-tbody">
+              <tr><td colspan="8" class="loading-state">Loading books...</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="table-footer" id="books-pagination"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add / Edit Book Modal -->
+  <div class="modal fade" id="bookModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="bookModalTitle">Add Book</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form id="book-form" novalidate>
+          <div class="modal-body">
+            <div id="book-form-error" class="alert alert-danger d-none" role="alert"></div>
+            <input type="hidden" id="book-id">
+            <div class="row g-3">
+              <div class="col-md-8">
+                <label class="form-label" for="book-title">Title *</label>
+                <input type="text" class="form-control" id="book-title" required maxlength="300">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label" for="book-isbn">ISBN (10 or 13 digits) *</label>
+                <input type="text" class="form-control" id="book-isbn" required placeholder="9780132350884">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label" for="book-category">Category *</label>
+                <select class="form-select" id="book-category" required></select>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label" for="book-publisher">Publisher</label>
+                <select class="form-select" id="book-publisher">
+                  <option value="">None / Unassigned</option>
+                </select>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label" for="book-year">Publication Year *</label>
+                <input type="number" class="form-control" id="book-year" min="1450" max="2100" required>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label" for="book-edition">Edition</label>
+                <input type="text" class="form-control" id="book-edition" maxlength="50" placeholder="e.g. 2nd">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label" for="book-language">Language *</label>
+                <input type="text" class="form-control" id="book-language" value="English" required maxlength="50">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label" for="book-shelf">Shelf Location</label>
+                <input type="text" class="form-control" id="book-shelf" maxlength="50" placeholder="e.g. T-101">
+              </div>
+              <div class="col-12">
+                <label class="form-label" for="book-authors">Author(s) * <span class="text-secondary fw-normal">(Hold Ctrl/Cmd to select multiple)</span></label>
+                <select class="form-select" id="book-authors" multiple size="4" required></select>
+              </div>
+              <div class="col-md-6 initial-copies-field">
+                <label class="form-label" for="book-initial-copies">Initial Physical Copies</label>
+                <input type="number" class="form-control" id="book-initial-copies" min="0" max="50" value="1">
+              </div>
+              <div class="col-md-6 initial-copies-field">
+                <label class="form-label" for="book-acc-prefix">Accession Prefix (optional)</label>
+                <input type="text" class="form-control" id="book-acc-prefix" maxlength="30" placeholder="e.g. ACC-NEW">
+              </div>
+              <div class="col-12">
+                <label class="form-label" for="book-description">Description</label>
+                <textarea class="form-control" id="book-description" rows="2"></textarea>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save Book</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Book Details Modal -->
+  <div class="modal fade" id="bookDetailsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Book Details & Physical Copies</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="book-details-body"></div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script type="module" src="../js/books.js"></script>
+</body>
+</html>

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — LibraDesk</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="css/styles.css" rel="stylesheet">
+</head>
+<body>
+  <div id="app-shell" class="app-shell">
+    <div id="page-content">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Library Dashboard</h1>
+          <p class="page-subtitle">Live circulation, copy availability, and overdue tracking</p>
+        </div>
+        <div class="d-flex gap-2">
+          <button type="button" class="btn btn-outline-secondary" id="refresh-dashboard-btn">
+            <i class="bi bi-arrow-clockwise"></i> Refresh
+          </button>
+          <a href="pages/issue-book.html" class="btn btn-primary">
+            <i class="bi bi-journal-arrow-up"></i> Issue Book
+          </a>
+        </div>
+      </div>
+
+      <div id="dashboard-error" class="alert alert-danger d-none" role="alert"></div>
+
+      <section class="kpi-grid" id="kpi-grid">
+        <div class="loading-state surface-panel">Loading library metrics...</div>
+      </section>
+
+      <div class="row g-3 mb-4">
+        <div class="col-12 col-lg-6">
+          <div class="surface-panel h-100">
+            <div class="panel-header">
+              <h2 class="panel-title">Monthly Borrowing & Returns</h2>
+              <span class="text-secondary small">Loans issued vs returned</span>
+            </div>
+            <div class="panel-body">
+              <div class="chart-wrap">
+                <canvas id="monthlyActivityChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-lg-6">
+          <div class="surface-panel h-100">
+            <div class="panel-header">
+              <h2 class="panel-title">Most Borrowed Books</h2>
+              <span class="text-secondary small">By total checkouts</span>
+            </div>
+            <div class="panel-body">
+              <div class="chart-wrap">
+                <canvas id="mostBorrowedChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-3 mb-4">
+        <div class="col-12 col-xl-5">
+          <div class="surface-panel h-100">
+            <div class="panel-header">
+              <h2 class="panel-title">Books by Category</h2>
+              <span class="text-secondary small">Physical copy distribution</span>
+            </div>
+            <div class="panel-body">
+              <div class="chart-wrap">
+                <canvas id="booksByCategoryChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-xl-7">
+          <div class="table-container h-100">
+            <div class="panel-header">
+              <h2 class="panel-title">Overdue Book Alerts</h2>
+              <a href="pages/overdue-books.html" class="btn btn-outline-secondary btn-sm">View All Overdue</a>
+            </div>
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Book</th>
+                    <th>Member</th>
+                    <th>Accession</th>
+                    <th>Due Date</th>
+                    <th class="text-end">Overdue</th>
+                  </tr>
+                </thead>
+                <tbody id="overdue-alerts-tbody">
+                  <tr><td colspan="5" class="loading-state">Loading...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-3 mb-4">
+        <div class="col-12 col-lg-6">
+          <div class="table-container h-100">
+            <div class="panel-header">
+              <h2 class="panel-title">Books Due Soon (Next 3 Days)</h2>
+              <a href="pages/return-book.html" class="text-decoration-none small">Process returns</a>
+            </div>
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Book</th>
+                    <th>Member</th>
+                    <th>Accession</th>
+                    <th>Due Date</th>
+                  </tr>
+                </thead>
+                <tbody id="due-soon-tbody">
+                  <tr><td colspan="4" class="loading-state">Loading...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-lg-6">
+          <div class="table-container h-100">
+            <div class="panel-header">
+              <h2 class="panel-title">Recent Returns</h2>
+              <a href="pages/borrowing-history.html" class="text-decoration-none small">History</a>
+            </div>
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Book</th>
+                    <th>Member</th>
+                    <th>Returned</th>
+                    <th class="text-end">Fine</th>
+                  </tr>
+                </thead>
+                <tbody id="recent-returns-tbody">
+                  <tr><td colspan="4" class="loading-state">Loading...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <div class="panel-header">
+          <h2 class="panel-title">Recent Borrowing Activity</h2>
+          <a href="pages/borrowing-history.html" class="text-decoration-none small">All loans</a>
+        </div>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Loan #</th>
+                <th>Book Title</th>
+                <th>Accession</th>
+                <th>Member</th>
+                <th>Issued</th>
+                <th>Due Date</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="recent-borrowings-tbody">
+              <tr><td colspan="7" class="loading-state">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <script type="module" src="js/dashboard.js"></script>
+</body>
+</html>

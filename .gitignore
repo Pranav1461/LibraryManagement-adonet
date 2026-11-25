@@ -1,0 +1,23 @@
+# Build results
+bin/
+obj/
+out/
+
+# User-specific and IDE files
+.vs/
+.vscode/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+.DS_Store
+Thumbs.db
+
+# Test results and logs
+TestResults/
+*.trx
+*.log
+
+# Local environment secrets
+appsettings.*.local.json
+secrets.json

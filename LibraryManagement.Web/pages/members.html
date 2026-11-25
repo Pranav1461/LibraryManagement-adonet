@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Members — LibraDesk</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="../css/styles.css" rel="stylesheet">
+</head>
+<body>
+  <div id="app-shell" class="app-shell">
+    <div id="page-content">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Members</h1>
+          <p class="page-subtitle">Manage library memberships, expiry dates, and borrowing history</p>
+        </div>
+        <button type="button" class="btn btn-primary" id="add-member-btn">
+          <i class="bi bi-plus-lg"></i> Register Member
+        </button>
+      </div>
+
+      <div class="filter-toolbar">
+        <div class="search-input-wrap">
+          <i class="bi bi-search"></i>
+          <input type="text" class="form-control" id="member-search" placeholder="Search name, membership #, email, phone...">
+        </div>
+        <select class="form-select w-auto" id="member-filter-status">
+          <option value="">All Statuses</option>
+          <option value="Active">Active</option>
+          <option value="Inactive">Inactive</option>
+          <option value="Expired">Expired</option>
+        </select>
+        <button type="button" class="btn btn-outline-secondary btn-sm" id="member-reset-btn">Reset</button>
+      </div>
+
+      <div class="table-container">
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Membership #</th>
+                <th>Full Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Expiry Date</th>
+                <th class="text-end">Active / Overdue</th>
+                <th>Status</th>
+                <th class="text-end">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="members-tbody">
+              <tr><td colspan="8" class="loading-state">Loading members...</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="table-footer" id="members-pagination"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Register / Edit Member Modal -->
+  <div class="modal fade" id="memberModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="memberModalTitle">Register Member</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form id="member-form" novalidate>
+          <div class="modal-body">
+            <div id="member-form-error" class="alert alert-danger d-none" role="alert"></div>
+            <input type="hidden" id="member-id">
+            <div class="row g-3 mb-3">
+              <div class="col-md-5">
+                <label class="form-label" for="member-number">Membership # *</label>
+                <input type="text" class="form-control" id="member-number" required maxlength="50" placeholder="MEM-021">
+              </div>
+              <div class="col-md-7">
+                <label class="form-label" for="member-name">Full Name *</label>
+                <input type="text" class="form-control" id="member-name" required maxlength="200">
+              </div>
+            </div>
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label" for="member-email">Email *</label>
+                <input type="email" class="form-control" id="member-email" required maxlength="150">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="member-phone">Phone *</label>
+                <input type="text" class="form-control" id="member-phone" required maxlength="30">
+              </div>
+            </div>
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label" for="member-expiry">Expiry Date *</label>
+                <input type="date" class="form-control" id="member-expiry" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="member-status">Status *</label>
+                <select class="form-select" id="member-status" required>
+                  <option value="Active">Active</option>
+                  <option value="Inactive">Inactive</option>
+                  <option value="Expired">Expired</option>
+                </select>
+              </div>
+            </div>
+            <div class="mb-0">
+              <label class="form-label" for="member-address">Address</label>
+              <textarea class="form-control" id="member-address" rows="2" maxlength="500"></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save Member</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Member Borrowing Details Modal -->
+  <div class="modal fade" id="memberDetailsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="memberDetailsTitle">Member Profile</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="member-details-body"></div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script type="module" src="../js/members.js"></script>
+</body>
+</html>
